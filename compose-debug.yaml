@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - 53000:53000
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ${HOME}/.fx/certificate:/app/.fx/certificate
+    env_file:
+      - .localConfigs
+    environment:
+      - SSL_CRT_FILE=/app/.fx/certificate/localhost.crt
+      - SSL_KEY_FILE=/app/.fx/certificate/localhost.key
+      - REACT_APP_FUNC_ENDPOINT=http://api:80
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - 7071:80
+    volumes:
+      - ./api:/home/site/wwwroot
+      - /home/site/wwwroot/node_modules
+      - /home/site/wwwroot/bin
+    env_file:
+      - api/.localConfigs
+    environment:
+      - CORS_ALLOWED_ORIGINS=["*"]
